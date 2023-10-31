@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="/Projects/todoApp/bootstrap.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+
+    <style>
+
+        .i-Cont{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            max-width: 50%;
+            height: 30%;
+            margin: 25px auto;
+        }
+        .inp-txt{
+            all: unset;
+            width: 100%;
+        }
+        .m-Box{
+            width: 1000px;
+            background-color: #323232;
+            margin: auto;
+            padding: 25px;
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: space-evenly;
+            flex-wrap: wrap;
+            min-height: 100px;
+        }
+        .m1-Box{
+            height: fit-content; 
+            width: 1000px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-evenly; 
+            flex-flow: row wrap;
+        }
+        .item-Cont{
+            display: flex;
+            flex-flow: row wrap;
+            padding: 5px;
+            margin: 5px;
+            background-color: antiquewhite;
+            width: 900px;
+            height: 50px;
+            border-radius: 10px;
+            box-shadow: 1px 1px 10px 5px black;
+        }
+        .inp-Box{
+            padding: 7px 0px 0px 15px;
+            color: black;
+            height: 85%;
+            width: 80%;
+            overflow-x: scroll;
+            overflow-y: hidden;
+        }
+        .edit-Text{
+            background-color: lightsalmon;
+            box-shadow: inset 1px 1px 10px 1px brown;
+        }
+        .b1{
+            border: transparent;
+            background-color: transparent;
+            width: 80px;
+            height: 40px;
+            margin-bottom: 10px;
+            float: right;
+            color: darkorange;
+            font-weight: 750;
+        }
+        .b2{
+            border: transparent;
+            background-color: transparent;
+            width: 80px;
+            height: 40px;
+            margin-bottom: 10px;
+            float: right;
+            color: crimson;
+            font-weight: 750;
+        }
+        ::-webkit-scrollbar {
+        height: 5px;
+        width: 5px;
+        }
+        ::-webkit-scrollbar-track {
+        box-shadow: inset 0 0 5px transparent; 
+        border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+        background: #323232; 
+        border-radius: 10px;
+        }
+    
+    </style>
+    
+    <title>To-Do</title>
+
+</head>
+
+<body style="background-color: aliceblue;">
+    <script src="/Projects/todoApp/bootstrap.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+
+    <!-- -----------------------------------Input----------------------------------------- -->
+
+    
+    <div class="i-Cont">            
+        <h1>Input</h1>
+        <input type="text" class="p-2 m-2 col-12 rounded" style="background-color: white; border: transparent; box-shadow: 1px 1px 10px 5px black; width: 650px;" placeholder="Item Name" id="i1">      
+        <textarea class=" my-2 form-control rounded" style="border: transparent; box-shadow: 1px 1px 10px 5px black; width: 650px;" rows="3" placeholder="Description" id="i2"></textarea>
+        <div class="container my-3 d-flex align-items-center justify-content-center">
+            <button type="button" onclick="subForm('add')" style="box-shadow: 1px 1px 10px 5px black;" class="mx-3 btn btn-info bg-gradient rounded fw-bold">Add Item</button>    
+            <button type="button" onclick="loadForm()" style="box-shadow: 1px 1px 10px 5px black;" class="mx-3 btn btn-info bg-gradient rounded fw-bold">Load</button>     
+        </div>
+    </div>    
+    
+    <!-- -----------------------------------Output---------------------------------------- -->
+    
+    <h1 style="text-align: center;">Output</h1>
+    <div class="m-Box" id="m1">
+        <div class="m1-Box" id="m2">
+            <!-- <div class="item-Cont">
+                <div class="inp-Box"><input type="text" class="inp-txt" value="aaa" readonly></div>
+                <button class="b1" type="button">Edit</button>
+                <button class="b2" type="button">Delete</button>
+            </div> -->
+        </div> 
+    </div> 
+    
+    <!-- --------------------------------Javascript--------------------------------------- -->
+    
+    <script>
+        
+        var fname = document.getElementById('i1');
+        var fdesc = document.getElementById('i2');
+        var mbox = document.getElementById('m1');
+        var m1box = document.getElementById('m2');
+       
+//---------------------------------------Submit Form------------------------------------------
+
+        subForm = async(action) => {
+        
+            var formD = new FormData();
+            formD.append("name", this.fname.value);
+            formD.append("desc", this.fdesc.value);
+            formD.append("act", action);
+
+            let response = await fetch('toDo_add.php', { method: 'POST', body: formD });
+            var info = await response.json();
+         
+            m1box.innerHTML = '';
+            
+            info.forEach(a => {                
+                m1box.appendChild(addTask(a));
+                mbox.appendChild(m1box);
+            });
+            rstCont();
+        }
+
+//---------------------------------------Add Task----------------------------------------------
+
+        addTask = (to) => {
+            
+            var icont = document.createElement('div');
+            icont.classList.add('item-Cont');
+            icont.setAttribute('data-todo-id',to.tid);
+
+            var inp = document.createElement('div');
+            inp.classList.add('inp-Box');
+            var edBtn = document.createElement('button');
+            edBtn.classList.add('b1');
+            var delBtn = document.createElement('button');
+            delBtn.classList.add('b2');
+            
+            var inpTxt = document.createElement('input');
+            inpTxt.classList.add('inp-txt');
+            inpTxt.setAttribute('readonly','true');
+            
+            inpTxt.setAttribute('value', to.tname);
+            edBtn.innerText = 'Edit';
+            delBtn.innerText = 'Delete';
+
+            inp.appendChild(inpTxt);
+
+            icont.appendChild(inp);
+            icont.appendChild(edBtn);
+            icont.appendChild(delBtn);
+
+            edBtn.setAttribute('onclick', 'edTask(this.parentElement.childNodes[0].childNodes[0])');
+            delBtn.setAttribute('onclick', 'delTask(this.parentNode)'); 
+            
+            return icont;
+        }
+//-----------------------------------------Edit Task---------------------------------------------
+        edTask = async(ele) => {
+
+            if (ele.getAttribute('readonly')) {
+                ele.removeAttribute('readonly');
+                ele.parentNode.parentNode.childNodes[1].innerText = 'Save';
+                ele.setAttribute('value', ele.value);
+            }
+            else{
+                ele.setAttribute('readonly', 'true');
+                ele.parentNode.parentNode.childNodes[1].innerText = 'Edit';
+
+                var formD = new FormData();
+
+                formD.append("editId", ele.parentNode.parentNode.dataset.todoId);
+                formD.append("editName", ele.value);
+
+                let response = await fetch('toDo_edit.php', { method: 'POST', body: formD });                       
+            }
+        }
+
+//----------------------------------------Delete Task------------------------------------------
+
+        delTask = async(ele) => {
+
+            let entryId = ele.getAttribute('data-todo-id');
+
+            var formD = new FormData();
+            formD.append("delId", entryId);
+            var response = await fetch('toDo_del.php', { method: 'POST', body: formD }).then(response => response.text());
+            response = JSON.parse(response);
+            
+            ele.remove();
+            alert(response.message);
+        }
+        
+//----------------------------------------Load Tasks---------------------------------------------
+
+        loadForm = async() => {
+            
+            let response = await fetch('/Projects/todoApp/toDo_load.php');
+            var info = await response.json();
+            
+            m1box.innerHTML = '';
+            
+            info.forEach(a => {                
+                m1box.appendChild(addTask(a));
+                mbox.appendChild(m1box);
+            });
+        }
+
+//---------------------------------------Reset Input---------------------------------------------
+
+        rstCont = () => {
+            fname.value = null;
+            fdesc.value = null;
+        }        
+
+    </script>
+
+    </body>
+
+</html>
